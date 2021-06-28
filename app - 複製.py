@@ -9,9 +9,9 @@ app=Flask(__name__) # __name__代表目前執行的模組
 
 # LINE BOT info
 line_bot_api = LineBotApi('sBIB8FLCO7qzl4tQCbbT1MQChyb/uiYCTxySE4rLqholm+kTjgsxXUfFCQkvl/k95dMJLUDo87Afy7u8dS4biwLzezr0Bb6bu2PUdjKie7+aTxmgX5QHUplrn+oHAdOTUNMdspQXJ9AuzA2lRjMfAgdB04t89/1O/w1cDnyilFU=')
-handler = WebhookHandler('31b16de3e808253a7d272c75280cab7c')
+handler = WebhookHandler('b9f7acc632cb65d50b8af479e73cfc87')
 
-@app.route('/', methods=['POST']) # 函式的裝飾(Decorator): 以函式為基礎,提供附加的功能
+@app.route('/callback', methods=['POST']) # 函式的裝飾(Decorator): 以函式為基礎,提供附加的功能
 def callback():
     # get X-Line-Signature header value
     signature = request.headers['X-Line-Signature']
