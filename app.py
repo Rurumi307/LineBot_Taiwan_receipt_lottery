@@ -1,56 +1,83 @@
+from __future__ import unicode_literals
+import os
 from flask import Flask, request, abort
+from linebot import LineBotApi, WebhookHandler
+from linebot.exceptions import InvalidSignatureError
+from linebot.models import MessageEvent, TextMessage, TextSendMessage, ImageSendMessage, VideoSendMessage, LocationSendMessage
 
-from linebot import (LineBotApi, WebhookHandler)
-from linebot.exceptions import (InvalidSignatureError)
-from linebot.models import *
-import json
+app = Flask(__name__)
 
-app=Flask(__name__) # __name__代表目前執行的模組
+# LINE 聊天機器人的基本資料
+# LINE 的 channel_access_token, channel_secret 換成在 Line Developer 裡的資料
 
-# LINE BOT info
 line_bot_api = LineBotApi('sBIB8FLCO7qzl4tQCbbT1MQChyb/uiYCTxySE4rLqholm+kTjgsxXUfFCQkvl/k95dMJLUDo87Afy7u8dS4biwLzezr0Bb6bu2PUdjKie7+aTxmgX5QHUplrn+oHAdOTUNMdspQXJ9AuzA2lRjMfAgdB04t89/1O/w1cDnyilFU=')
 handler = WebhookHandler('31b16de3e808253a7d272c75280cab7c')
 
-@app.route('/', methods=['POST']) # 函式的裝飾(Decorator): 以函式為基礎,提供附加的功能
+# 接收 LINE 的資訊
+@app.route("/callback", methods=['POST'])
 def callback():
-    # get X-Line-Signature header value
     signature = request.headers['X-Line-Signature']
 
-    # get request body as text
     body = request.get_data(as_text=True)
     app.logger.info("Request body: " + body)
 
-    # handle webhook body
+    print(body)
+
     try:
         handler.handle(body, signature)
     except InvalidSignatureError:
-        print("Invalid signature. Please check your channel access token/channel secret.")
         abort(400)
 
     return 'OK'
 
-@handler.add(MessageEvent, message=(ImageMessage))
-def handle_image_message(event):
-    # 使用者傳送的照片
-    message_content = line_bot_api.get_message_content(event.message.id)
+# 回傳 LINE 的資料
+@handler.add(MessageEvent, message=TextMessage)
+def echo(event):
+    
+    if event.source.user_id != "Udeadbeefdeadbeefdeadbeefdeadbeef": #因為LINE有些預設資料,我們在此排除
+        try:
 
-    # 照片儲存名稱
-    fileName = event.message.id + '.jpg'
+            #event.message.text = user傳的訊息
 
-    # 儲存照片
-    with open('./image/' + fileName, 'wb')as f:
-        for chunk in message_content.iter_content():
-            f.write(chunk)
+            # 回訊息
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text="享社官網 : https://cruelshare.com/")
+                # TextSendMessage(text=event.message.text) #鸚鵡說話
+            )
 
-    # linebot回傳訊息
-    line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(text='收到您上傳的照片囉!'))
+            # 回圖片
+            line_bot_api.reply_message(
+                event.reply_token,
+                ImageSendMessage(
+                    original_content_url="https://onepage.nownews.com/sites/default/files/2020-05/%E9%A6%96%E9%A0%81%E5%B0%81%E9%9D%A2-%E3%80%8C%E5%8F%AF%E6%86%90%E5%93%AA%E3%80%8D%E3%80%81%E3%80%8C%E9%BB%91%E4%BA%BA%E5%95%8F%E8%99%9F%E3%80%8D%E3%80%81%E3%80%8C%E6%88%91%E5%B0%B1%E7%88%9B%E3%80%8D%E9%80%99%E4%BA%9B%E6%A2%97%E5%9C%96%E7%9A%84%E7%94%B1%E4%BE%86%E4%BD%A0%E7%9F%A5%E9%81%93%E5%97%8E%EF%BC%9F.jpg",
+                    preview_image_url="https://onepage.nownews.com/sites/default/files/2020-05/%E9%A6%96%E9%A0%81%E5%B0%81%E9%9D%A2-%E3%80%8C%E5%8F%AF%E6%86%90%E5%93%AA%E3%80%8D%E3%80%81%E3%80%8C%E9%BB%91%E4%BA%BA%E5%95%8F%E8%99%9F%E3%80%8D%E3%80%81%E3%80%8C%E6%88%91%E5%B0%B1%E7%88%9B%E3%80%8D%E9%80%99%E4%BA%9B%E6%A2%97%E5%9C%96%E7%9A%84%E7%94%B1%E4%BE%86%E4%BD%A0%E7%9F%A5%E9%81%93%E5%97%8E%EF%BC%9F.jpg"
+                )
+            )
 
-# @app.route("/test") # 代表我們要處理的網站路徑
-# def test():
-#     return "This is test"
+            # 回影片
+            VideoSendMessage(
+              original_content_url='https://www.youtube.com/watch?v=NxOph87AtGc',
+              preview_image_url='https://i.ytimg.com/vi/NxOph87AtGc/hqdefault.jpg?sqp=-oaymwEZCPYBEIoBSFXyq4qpAwsIARUAAIhCGAFwAQ==&rs=AOn4CLAnNrD2Lewo_HJFJNEt1eejHd5U1w'
+            )
 
-if __name__=="__main__": # 如果以主程式執行
-    app.run() 
+            # 回地址
+            LocationSendMessage(
+              title='my location',
+              address='Tokyo',
+              latitude=35.65910807942215,
+              longitude=139.70372892916203
+            )
 
+        except:
+
+            line_bot_api.reply_message(
+                event.reply_token,
+                ImageSendMessage(
+                    original_content_url="https://onepage.nownews.com/sites/default/files/2020-05/%E9%A6%96%E9%A0%81%E5%B0%81%E9%9D%A2-%E3%80%8C%E5%8F%AF%E6%86%90%E5%93%AA%E3%80%8D%E3%80%81%E3%80%8C%E9%BB%91%E4%BA%BA%E5%95%8F%E8%99%9F%E3%80%8D%E3%80%81%E3%80%8C%E6%88%91%E5%B0%B1%E7%88%9B%E3%80%8D%E9%80%99%E4%BA%9B%E6%A2%97%E5%9C%96%E7%9A%84%E7%94%B1%E4%BE%86%E4%BD%A0%E7%9F%A5%E9%81%93%E5%97%8E%EF%BC%9F.jpg",
+                    preview_image_url="https://onepage.nownews.com/sites/default/files/2020-05/%E9%A6%96%E9%A0%81%E5%B0%81%E9%9D%A2-%E3%80%8C%E5%8F%AF%E6%86%90%E5%93%AA%E3%80%8D%E3%80%81%E3%80%8C%E9%BB%91%E4%BA%BA%E5%95%8F%E8%99%9F%E3%80%8D%E3%80%81%E3%80%8C%E6%88%91%E5%B0%B1%E7%88%9B%E3%80%8D%E9%80%99%E4%BA%9B%E6%A2%97%E5%9C%96%E7%9A%84%E7%94%B1%E4%BE%86%E4%BD%A0%E7%9F%A5%E9%81%93%E5%97%8E%EF%BC%9F.jpg"
+                )
+            )
+
+if __name__ == "__main__":
+    app.run()
