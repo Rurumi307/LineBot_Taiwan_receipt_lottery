@@ -1,10 +1,15 @@
 from flask import Flask, request, abort
 
-from linebot import (LineBotApi, WebhookHandler)
-from linebot.exceptions import (InvalidSignatureError)
-from linebot.models import (MessageEvent, TextMessage, TextSendMessage,ImageMessage)
+from linebot import (
+    LineBotApi, WebhookHandler
+)
+from linebot.exceptions import (
+    InvalidSignatureError
+)
+from linebot.models import (
+    MessageEvent, TextMessage, TextSendMessage,
+)
 import json
-# import formrecognizer_by_local 
 
 app = Flask(__name__)
 
@@ -15,7 +20,7 @@ channelSecret = secretFile['channelSecret']
 line_bot_api = LineBotApi(channelAccessToken)
 handler = WebhookHandler(channelSecret)
 
-@app.route("/callback", methods=['POST'])
+@app.route("/", methods=['POST'])
 def callback():
     # get X-Line-Signature header value
     signature = request.headers['X-Line-Signature']
@@ -33,24 +38,14 @@ def callback():
 
     return 'OK'
 
-@handler.add(MessageEvent, message=(ImageMessage))
-def handle_image_message(event):
-    # 使用者傳送的照片
-    message_content = line_bot_api.get_message_content(event.message.id)
-    # 照片儲存名稱
-    fileName = event.message.id + '.jpg'
 
-    # 儲存照片
-    with open('./image/' + fileName, 'wb')as f:
-        for chunk in message_content.iter_content():
-            f.write(chunk)
-            
-    # local_image_path = './image/' + fileName       
-    # formrecognizer = formrecognizer_by_local(local_image_path)
-    # linebot回傳訊息
+@handler.add(MessageEvent, message=TextMessage)
+def handle_message(event):
     line_bot_api.reply_message(
         event.reply_token,
-        FlexSendMessage('收到您上傳的照片囉!'))
-        
+        TextSendMessage(text=event.message.text))
+
+    print(event.message.text) # 接收用戶訊息
+
 if __name__ == "__main__":
     app.run(host='0.0.0.0')
