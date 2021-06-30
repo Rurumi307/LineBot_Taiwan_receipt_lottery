@@ -10,6 +10,8 @@ from linebot.models import (
     MessageEvent, TextMessage, TextSendMessage,
 )
 import json
+from model import formrecognizer_by_local,receipt,selectdb
+
 
 app = Flask(__name__)
 
@@ -20,7 +22,7 @@ channelSecret = secretFile['channelSecret']
 line_bot_api = LineBotApi(channelAccessToken)
 handler = WebhookHandler(channelSecret)
 
-@app.route("/", methods=['POST'])
+@app.route("/callback", methods=['POST'])
 def callback():
     # get X-Line-Signature header value
     signature = request.headers['X-Line-Signature']
@@ -37,7 +39,7 @@ def callback():
         abort(400)
 
     return 'OK'
-
+    
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):

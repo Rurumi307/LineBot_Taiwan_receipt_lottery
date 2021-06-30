@@ -6,3 +6,5 @@ psycopg2
 numpy
 Pillow
 azure-ai-formrecognizer
+sshtunnel
+pymongo

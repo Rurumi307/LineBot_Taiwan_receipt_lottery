@@ -46,7 +46,7 @@ def formrecognizer_by_local(local_image_path):
     output["月份"] = output["月份"].replace(' 月','').replace('-','')
     output["發票號碼"] = output["發票號碼"][-8:]
     output["日期"] = output["年份"]+output["月份"]
-    print(output)
+    return output
     
 if __name__ == '__main()__':
     formrecognizer_by_local(local_image_path)
