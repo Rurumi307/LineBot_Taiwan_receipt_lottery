@@ -41,25 +41,6 @@ def callback():
     return 'OK'
 
 
-@handler.add(MessageEvent, message=(ImageMessage))
-def handle_image_message(event):
-    # 使用者傳送的照片
-    message_content = line_bot_api.get_message_content(event.message.id)
-
-    # 照片儲存名稱
-    fileName = event.message.id + '.jpg'
-
-    # 儲存照片
-    with open('./image/' + fileName, 'wb')as f:
-        for chunk in message_content.iter_content():
-            f.write(chunk)
-
-    # linebot回傳訊息
-    line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(text='收到您上傳的照片囉!'))
-
-
 # @handler.add(MessageEvent, message=TextMessage)
 # def handle_message(event):
 #     message_content = line_bot_api.get_message_content(event.message.id)
@@ -70,8 +51,13 @@ def handle_image_message(event):
 #         event.reply_token,
 #         TextSendMessage(text=ans))
 
+@handler.add(MessageEvent, message=TextMessage)
+def handle_message(event):
+    line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(text=event.message.text))
 
-#     print(event.message.text) # 接收用戶訊息
+    print(event.message.text) # 接收用戶訊息
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0')
