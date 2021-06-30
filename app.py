@@ -41,23 +41,23 @@ def callback():
     return 'OK'
 
 
-@handler.add(MessageEvent, message=TextMessage)
-def handle_message(event):
-    message_content = line_bot_api.get_message_content(event.message.id)
-    data = selectdb.Mongo_select(int(message_content))
-    ans = receipt(list('12345678'),data)
-
-    line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(text=ans))
-
 # @handler.add(MessageEvent, message=TextMessage)
 # def handle_message(event):
+#     message_content = line_bot_api.get_message_content(event.message.id)
+#     data = selectdb.Mongo_select(int(message_content))
+#     ans = receipt(list('12345678'),data)
+
 #     line_bot_api.reply_message(
 #         event.reply_token,
-#         TextSendMessage(text=event.message.text))
+#         TextSendMessage(text=ans))
 
-#     print(event.message.text) # 接收用戶訊息
+@handler.add(MessageEvent, message=TextMessage)
+def handle_message(event):
+    line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(text=event.message.text))
+
+    print(event.message.text) # 接收用戶訊息
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0')
