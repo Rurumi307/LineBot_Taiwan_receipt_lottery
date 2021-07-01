@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[ ]:
-
-
 # by local
 
 def formrecognizer_by_local(local_image_path):
@@ -34,7 +28,7 @@ def formrecognizer_by_local(local_image_path):
 
 
     for recognized_form in result:
-        print("Form type: {}".format(recognized_form.form_type))
+        # print("Form type: {}".format(recognized_form.form_type))
     #     print(recognized_form.fields)
         for name, field in recognized_form.fields.items():
             if name not in output:
@@ -42,12 +36,11 @@ def formrecognizer_by_local(local_image_path):
             else:
                 output[name].append(field.value)
 
-    output["年份"] = output["年份"].replace(' 年','')
-    output["月份"] = output["月份"].replace(' 月','').replace('-','')
+    output["年份"] = output["年份"][0:3]
+    output["月份"] = output["月份"].split('-')[0].zfill(2)
     output["發票號碼"] = output["發票號碼"][-8:]
-    output["日期"] = output["年份"]+output["月份"]
+    output["日期"] = output["年份"][0:3]+output["月份"].split('-')[0].zfill(2)
     return output
-    
+
 if __name__ == '__main()__':
     formrecognizer_by_local(local_image_path)
-
