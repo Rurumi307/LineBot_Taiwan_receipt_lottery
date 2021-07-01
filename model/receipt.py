@@ -6,7 +6,7 @@ def receipt_mechine(receipt_num_list,receipt_data):
     if 'error' in ['error' for i in receipt_num_list if len(i) != 8]:
         return([(i,'the receipt numbers are not correct') for i in receipt_num_list if len(i) !=8 ])
     else :
-        date = receipt_data['日期']
+        date = receipt_data['Date']
         special_prize = receipt_data['特別獎']
         special_prize_sec = receipt_data['特獎']
         head_prize = receipt_data['頭獎']
