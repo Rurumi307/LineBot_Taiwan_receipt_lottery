@@ -18,7 +18,7 @@ def formrecognizer_by_url(formUrl):
 
     # call API
     form_recognizer_client = FormRecognizerClient(endpoint, AzureKeyCredential(key))
-    trained_model_id = "240e58da-7514-4e22-9ac4-efd6705d8280"
+    trained_model_id = "73bebc87-1c6d-44da-84a1-ef7ed9a6a4a1"
 
 
     # URL

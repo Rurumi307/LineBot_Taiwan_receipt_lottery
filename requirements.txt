@@ -9,4 +9,4 @@ azure-ai-formrecognizer
 sshtunnel
 pymongo
 imgurpython
-pyimgur
+datetime

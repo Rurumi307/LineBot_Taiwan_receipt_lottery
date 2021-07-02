@@ -11,6 +11,7 @@ from model import formrecognizer_by_url,receipt,selectdb
 import tempfile, os
 from imgurpython import ImgurClient
 from config import *
+import datetime 
 
 app = Flask(__name__)
 
@@ -69,10 +70,18 @@ def handle_message(event):
             number_id = formrecognizer_by_url.formrecognizer_by_url(image_url) 
             invoice_date = number_id['日期']       
             invoice_number = number_id['發票號碼']  
-            receipt_data = selectdb.Mongo_select(int(invoice_date))
-            ans = receipt.receipt_mechine([invoice_number],receipt_data)
-            # 回傳訊息的方法
-            line_bot_api.reply_message(event.reply_token,TextSendMessage(text=ans[0][2]))   
+
+            D = datetime.datetime.today().strftime('%m%d')
+            today = int(D)
+            date_x = int(str(int(invoice_date)+2)[3:] + str('25')) 
+            if today > date_x :
+                receipt_data = selectdb.Mongo_select(int(invoice_date))
+                ans = receipt.receipt_mechine([invoice_number],receipt_data)
+                # 回傳訊息的方法
+                line_bot_api.reply_message(event.reply_token,TextSendMessage(text=ans[0][2]))
+            else: 
+                line_bot_api.reply_message(event.reply_token,TextSendMessage(text='未開獎'))
+   
             return 0
         except:
             line_bot_api.reply_message(
