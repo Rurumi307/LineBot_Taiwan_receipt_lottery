@@ -10,3 +10,4 @@ sshtunnel
 pymongo
 imgurpython
 datetime
+sqlite3

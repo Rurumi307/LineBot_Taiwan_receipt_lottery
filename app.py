@@ -12,6 +12,8 @@ import tempfile, os
 from imgurpython import ImgurClient
 from config import *
 import datetime 
+# import for database
+import sqlite3
 
 app = Flask(__name__)
 
@@ -20,6 +22,10 @@ line_bot_api = LineBotApi(channelAccessToken)
 handler = WebhookHandler(channelSecret)
 
 static_tmp_path = os.path.join(os.path.dirname(__file__), 'image', 'tmp')
+
+# connect to database
+connect = sqlite3.connect('log.db',check_same_thread=False)
+cursor = connect.cursor()
 
 @app.route("/callback", methods=['POST'])
 def callback():
@@ -41,7 +47,8 @@ def handle_message(event):
     # 接收訊息
     message_type = event.message.type
     user_id = event.source.user_id
-
+    user_name = line_bot_api.get_profile(user_id).display_name
+    
     if isinstance(event.message, ImageMessage):
 
         message_content = line_bot_api.get_message_content(event.message.id)
@@ -79,21 +86,43 @@ def handle_message(event):
                 ans = receipt.receipt_mechine([invoice_number],receipt_data)
                 # 回傳訊息的方法
                 line_bot_api.reply_message(event.reply_token,TextSendMessage(text=ans[0][2]))
+                # save into database
+                cursor.execute("INSERT INTO log (name, user_id, invoice_number, invoice_date, type, other) \
+                                VALUES (?, ?, ?, ?, ?, ?)", (user_name, user_id, invoice_number, invoice_date,message_type,image_url))
+                connect.commit()
             else: 
                 line_bot_api.reply_message(event.reply_token,TextSendMessage(text='未開獎'))
-   
+                # save into database
+                cursor.execute("INSERT INTO log (name, user_id, invoice_number, invoice_date, type, other) \
+                                VALUES (?, ?, ?, ?, ?, ?)", (user_name, user_id, invoice_number, invoice_date,message_type,'未開獎'))
+                connect.commit()
             return 0
+
+
         except:
             line_bot_api.reply_message(
                 event.reply_token,
                 TextSendMessage(text='上傳失敗'))
+                
+            # save into database
+            cursor.execute("INSERT INTO log (name, user_id, invoice_number, invoice_date, type, other) \
+                            VALUES (?, ?, ?, ?, ?, ?)", (user_name, user_id, None, None,message_type,'上傳失敗'))
+            connect.commit()
             return 0
         
     elif isinstance(event.message, TextMessage):
         message = event.message.text
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text = message))
+        # save into database
+        cursor.execute("INSERT INTO log (name, user_id, invoice_number, invoice_date, type, other) \
+                        VALUES (?, ?, ?, ?, ?, ?)", (user_name, user_id, None, None,message_type,message))
+        connect.commit()
     else:
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text = "Error"))
+        # save into database
+        cursor.execute("INSERT INTO log (name, user_id, invoice_number, invoice_date, type, other) \
+                        VALUES (?, ?, ?, ?, ?, ?)", (user_name, user_id, None, None,message_type,message_type))
+        connect.commit()
 import os
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 80))
