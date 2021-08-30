@@ -13,12 +13,12 @@ def formrecognizer_by_url(formUrl):
     from azure.core.credentials import AzureKeyCredential
 
     # Set user key, endpoint
-    key = "653310d794cd4bcba674b91918a7dc72"
-    endpoint = "https://tfb102-t4-project.cognitiveservices.azure.com/"
+    key = "xxxxxxx"
+    endpoint = "xxxxxxx"
 
     # call API
     form_recognizer_client = FormRecognizerClient(endpoint, AzureKeyCredential(key))
-    trained_model_id = "73bebc87-1c6d-44da-84a1-ef7ed9a6a4a1"
+    trained_model_id = "xxxxxxx"
 
 
     # URL
