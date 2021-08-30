@@ -2,16 +2,16 @@ import pymongo
 # import urllib.parse
 from sshtunnel import SSHTunnelForwarder
     
-server = SSHTunnelForwarder(('3.113.29.214', 22), #連線AWS遠端主機
-    ssh_password='koxhAS?ZRayMorAddS6*HzZMZ3LFh*wK',
-    ssh_username='Administrator',
+server = SSHTunnelForwarder(('xxxxxxx', 22), #連線AWS遠端主機
+    ssh_password='xxxxxxx',
+    ssh_username='xxxxxxx',
     remote_bind_address=('127.0.0.1', 27017))
 
 def Mongo_start(): #主機啟動
     server.start()
     client=pymongo.MongoClient('127.0.0.1', server.local_bind_port)
-    # username = urllib.parse.quote_plus('root')
-    # password = urllib.parse.quote_plus('123456')
+    # username = urllib.parse.quote_plus('xxxxxxx')
+    # password = urllib.parse.quote_plus('xxxxxxx')
     # client = pymongo.MongoClient(f'mongodb://{username}:{password}@db:27017/')
     return client
 
